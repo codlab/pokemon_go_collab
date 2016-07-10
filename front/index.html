@@ -76,6 +76,12 @@
   }
 
   $(function(){
+
+    if (window.location.protocol != "https:") {
+      window.location.protocol = "https:";
+      window.location.reload();
+    }
+
     $(window).resize(function() {
       updateHeight();
     });
