@@ -1,4 +1,4 @@
-var socket = io.connect();
+var socket = io.connect(":3000");
 
 var map = undefined;
 var marker = undefined;
