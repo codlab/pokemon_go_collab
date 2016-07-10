@@ -2,6 +2,7 @@
 <head>
   <title>Pokémon Collaborative Map</title>
 
+  <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
   <link type="text/css" rel="stylesheet" href="css/index.css"  media="screen,projection"/>
 
@@ -14,10 +15,19 @@
   <header>
     <nav class="top-nav">
       <div class="card header-title">
-        <div class="nav-wrapper"><a class="page-title">Pokémon Collaborative Map</a></div>
+        <div class="nav-wrapper">
+          <div class="row">
+            <div class="col s1">
+              <a href="#" data-activates="leftmenu" style="padding-top:26px" class="page-title button-collapse full hide-on-large-only"><i class="material-icons">menu</i></a>
+            </div>
+            <div class="col s10 left">
+              <a class="page-title left">Pokémon Go Map</a>
+            </div>
+          </div>
+        </div>
       </div>
     </nav>
-    <div class="container"><a href="#" data-activates="leftmenu" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a></div>
+    <div class="container"></div>
     <div class="side-nav fixed" id="leftmenu">
       <ul id="nav-mobile" class="" style="margin:0px">
       </ul>
@@ -28,11 +38,6 @@
     <div class="row divider-top"></div>
 
     <div class="row container">
-      <div class="card">
-        <div class="card-content">
-        </div>
-      </div>
-
       <div id="map"></div>
     </div>
 
@@ -54,6 +59,30 @@
   <script type="text/javascript" src="js/materialize.init.js"></script>
   <script type="text/javascript" src="js/maps.js"></script>
   <script type="text/javascript">
+
+  function height(element){
+    return element.first().outerHeight(true);
+  }
+
+  function updateHeight(){
+    var around = height($("footer")) + height($(".top-nav"));
+
+    var margin = height($(".divider-top"));
+
+    console.log("margin := "+margin);
+    $("#map").height( window.innerHeight - around - margin);
+
+    console.log($("#map").height());
+  }
+
+  $(function(){
+    $(window).resize(function() {
+      updateHeight();
+    });
+
+    updateHeight();
+  });
+
   </script>
 </body>
 </html>
