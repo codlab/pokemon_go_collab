@@ -1,5 +1,8 @@
 # Pokemon Go Collaborative Map
 
+Website live at [https://go.codlab.eu](https://go.codlab.eu)
+
+
 ## Installation and requirements
 ```
 git clone
