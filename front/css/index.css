@@ -30,3 +30,7 @@ footer.page-footer {
   background-color: #4caf50 !important;
   margin-bottom: 0;
 }
+
+.hide {
+  display: none;
+}

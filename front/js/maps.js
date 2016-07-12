@@ -3,8 +3,24 @@ var socket = io.connect(":3000");
 var map = undefined;
 var marker = undefined;
 
+socket.on("newGeoData", function(GeoData){
+  console.log("newGeoData");
+  console.log(GeoData);
+});
+
 function sendLocation(latLng){
-  socket.emit("location",latLng);
+  socket.emit("location", {
+    type: 0,
+    location: latLng,
+    name: "sendLocation"
+  });
+}
+
+function onUserMarkerClicked(location){
+  //location := {lat, lng}
+  $("#modal").click();
+
+  //sendLocation(location);
 }
 
 function placeMarkerAndPanTo(latLng, map) {
@@ -13,11 +29,14 @@ function placeMarkerAndPanTo(latLng, map) {
       position: latLng,
       map: map
     });
+
+    marker.addListener("click", function(){
+      onUserMarkerClicked(marker.getPosition());
+    });
   }else{
     marker.setPosition(latLng);
   }
   map.panTo(latLng);
-  sendLocation(latLng);
 }
 
 
@@ -62,7 +81,16 @@ function initMap() {
   });
 }
 
+function checkHTTPS(){
+  if (window.location.href.indexOf("localhost:3000") < 0 && window.location.protocol != "https:") {
+    window.location.href = "https://go.codlab.eu";
+  }
+}
+
 $(function(){
+
+  $('#modal').leanModal();
+
   var fileref=document.createElement('script')
   fileref.setAttribute("type","text/javascript")
   fileref.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key="+config.maps+"&callback=initMap")

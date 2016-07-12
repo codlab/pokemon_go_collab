@@ -39,8 +39,20 @@
 
     <div class="row container">
       <div id="map"></div>
-    </div>
 
+      <a href="#modal_new_point" id="modal" class="hide">Modal</a>
+      <div id="modal_new_point" class="modal bottom-sheet">
+        <div class="modal-content">
+          <h4>New Pokemon GO point</h4>
+          <p>Here you will be able to select the type of event on your position</p>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class=" modal-action waves-effect waves-green btn-flat">Ok</a>
+          <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+        </div>
+      </div>
+
+    </div>
   </main>
 
   <footer class="page-footer card">
@@ -77,9 +89,7 @@
 
   $(function(){
 
-    if (window.location.protocol != "https:") {
-      window.location.href = "https://go.codlab.eu";
-    }
+    checkHTTPS();
 
     $(window).resize(function() {
       updateHeight();
