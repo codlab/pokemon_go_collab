@@ -1,20 +1,28 @@
+var port = 3000;
+var server = undefined;
+
+var config = require("./server/config.js");
 var express = require("express");
 var app = express();
-var server = require("http").Server(app);
-var io = require("socket.io")(server);
+var fs = require("fs");
 var database = require("./server/database.js");
 var moment = require("moment");
 var sanitize = require('validator').sanitize;
-var config = require('server/config.js');
 
-if(config.key_pem && config.cert_pem){
+if(config.key_pem && config.cert_pem && config.ca_pem && config.port){
   var https = require('https');
 
-  app = https.createServer({
+  server = https.createServer({
     key: fs.readFileSync(config.key_pem),
-    cert: fs.readFileSync(config.cert_pem)
-  }, app).listen(config.port);
+    cert: fs.readFileSync(config.cert_pem),
+    ca: fs.readFileSync(config.ca_pem)
+  }, app);
+  port = config.port;
+}else{
+  server = require("http").Server(app);
 }
+
+var io = require("socket.io")(server);
 
 app
 .use(express.static("./front"))
@@ -37,6 +45,7 @@ app
 });
 
 io.on('connection', function (socket) {
+  console.log("client connected");
   socket.on('location', function (data) {
     var GeoData = database.newGeoData({
       name: sanitize(data.name).xss(),
@@ -57,4 +66,5 @@ io.on('connection', function (socket) {
   });
 });
 
-io.listen(app.listen(3000));
+server.listen(port);
+
