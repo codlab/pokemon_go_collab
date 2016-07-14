@@ -45,6 +45,16 @@
         <div class="modal-content">
           <h4>New Pokemon GO point</h4>
           <p>Here you will be able to select the type of event on your position</p>
+          <div class="row">
+            <div class="col s12">
+
+              <div class="input-field col s12 m6">
+                <select mclass="icons" id="types">
+                </select>
+                <label>Element sur la carte</label>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <a href="#!" class=" modal-action waves-effect waves-green btn-flat">Ok</a>
@@ -72,6 +82,51 @@
   <script type="text/javascript" src="js/maps.js"></script>
   <script type="text/javascript">
 
+  function loadListing(){
+    var i = 1;
+    var select_code = "<option value=\"\" disabled selected>Choose your option</option>";
+    select_code+= "<optgroup label=\"Lieux\">";
+    select_code+= " <option value=\"90000\" data-icon=\"images/1.png\" class=\"circle\">PokéStop</option>";
+    select_code+= " <option value=\"90001\" data-icon=\"images/1.png\" class=\"circle\">PokéGym</option>";
+    select_code+= "</optgroup>";
+    select_code+= "<optgroup label=\"Pokémon\">";
+    for(;i<=151;i++){
+      select_code+= " <option value=\""+i+"\" data-icon=\"images/"+i+".png\" class=\"circle\">#"+i+"</option>";
+    }
+    select_code+= "</optgroup>";
+
+    $("#types").html(select_code);
+    $("#types").material_select();
+
+
+    // Configuration of the pokemon and point listing
+    var ul = $("#modal_new_point").find("ul").first();
+
+    ul.appendTo($("body").first());
+    ul.css("z-index",9999);
+
+    var state = ul.css("display")
+
+    //detect whenever the user click on the list
+    setInterval(function(){
+      //if the state of the list changed > clicked
+      if(ul.css("display") != state){
+        //TODO? only when list visible
+        state = ul.css("display");
+        var item = $(".select-wrapper").first();
+
+        var top = parseInt(ul.css("top"));
+        var delta_top = item.offset().top;
+        var delta_left = item.offset().left;
+        if(top < delta_top){
+          top += delta_top;
+          ul.css("top", top+"px");
+        }
+        ul.css("left", delta_left+"px");
+      }
+    }, 300);
+  }
+
   function height(element){
     return element.first().outerHeight(true);
   }
@@ -90,6 +145,8 @@
   $(function(){
 
     checkHTTPS();
+
+    loadListing();
 
     $(window).resize(function() {
       updateHeight();
