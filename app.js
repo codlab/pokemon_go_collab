@@ -7,7 +7,7 @@ var app = express();
 var fs = require("fs");
 var database = require("./server/database.js");
 var moment = require("moment");
-var sanitize = require('validator').sanitize;
+var validator = require('validator');
 
 if(config.key_pem && config.cert_pem && config.ca_pem && config.port){
   var https = require('https');
@@ -45,11 +45,10 @@ app
 });
 
 io.on('connection', function (socket) {
-  console.log("client connected");
   socket.on('location', function (data) {
     var GeoData = database.newGeoData({
-      name: sanitize(data.name).xss(),
-      type: sanitize(data.type).toInt(),
+      name: validator.escape(data.name),
+      type: parseInt(validator.escape(""+data.type)),
       date: new Date(),
       location: [
         data.location.lng,
@@ -67,4 +66,3 @@ io.on('connection', function (socket) {
 });
 
 server.listen(port);
-
