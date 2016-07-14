@@ -57,7 +57,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <a href="#!" class=" modal-action waves-effect waves-green btn-flat">Ok</a>
+          <a href="#!" id="types_validate" class=" modal-action waves-effect waves-green btn-flat">Ok</a>
           <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
         </div>
       </div>
@@ -97,6 +97,22 @@
 
     $("#types").html(select_code);
     $("#types").material_select();
+    $("#types").on("change", function (e) {
+      var type = parseInt($("#types").val());
+      if(type >= 1){
+        $("#types").addClass("green");
+      }else{
+
+      }
+    });
+
+    console.log("init");
+    $("#types_validate").click(function (e) {
+      var type = parseInt($("#types").val());
+      if(type >= 1){
+        sendLocationWithType(type);
+      }
+    });
 
 
     // Configuration of the pokemon and point listing

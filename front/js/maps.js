@@ -8,17 +8,27 @@ socket.on("newGeoData", function(GeoData){
   console.log(GeoData);
 });
 
-function sendLocation(latLng){
+function sendLocationWithType(type){
+  console.log(current_location+" "+type);
+  if(current_location && type){
+    sendLocation(current_location, type);
+  }
+}
+
+function sendLocation(latLng, type){
   socket.emit("location", {
-    type: 0,
+    type: parseInt(type),
     location: latLng,
-    name: "sendLocation"
+    name: ""
   });
 }
 
 function onUserMarkerClicked(location){
   //location := {lat, lng}
+
+  $("#types").removeClass("green");
   $("#modal").click();
+  current_location = location;
 
   //sendLocation(location);
 }
