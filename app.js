@@ -5,7 +5,7 @@ var io = require("socket.io")(server);
 var database = require("./server/database.js");
 var moment = require("moment");
 var sanitize = require('validator').sanitize;
-
+var config = require('server/config.js');
 
 if(config.key_pem && config.cert_pem){
   var https = require('https');
