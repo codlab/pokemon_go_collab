@@ -6,6 +6,16 @@ var database = require("./server/database.js");
 var moment = require("moment");
 var sanitize = require('validator').sanitize;
 
+
+if(config.key_pem && config.cert_pem){
+  var https = require('https');
+
+  app = https.createServer({
+    key: fs.readFileSync(config.key_pem),
+    cert: fs.readFileSync(config.cert_pem)
+  }, app).listen(config.port);
+}
+
 app
 .use(express.static("./front"))
 .get("/api/locations", function(req, res){
