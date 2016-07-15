@@ -74,8 +74,9 @@ function placeMarkerAndPanTo(latLng, map) {
   }else{
     marker.setPosition(latLng);
   }
+  console.log("--");
 
-  try{
+  setTimeout(function(){
     var lat = 0;
     var lng = 0;
 
@@ -91,10 +92,8 @@ function placeMarkerAndPanTo(latLng, map) {
         appendGeoData(data[k]);
       }
     });
-  }catch(e){
-    console.log(latLng);
-    console.log(e);
-  }
+  }, 200);
+
   map.panTo(latLng);
 }
 
