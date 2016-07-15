@@ -1,4 +1,5 @@
-var mongoose = require('mongoose');
+var mongoose = require("mongoose");
+var constants = require("../front/js/constants.js");
 
 mongoose.connect('mongodb://localhost/pokemon_go');
 
@@ -12,10 +13,11 @@ db.once('open', function() {
   var GeoDataScheme = mongoose.Schema({
     name: String,
     type: Number,
+    uuid: String,
     date: { type: Date, required: true, index:true},
     location: {
       type: [Number],  // [<longitude>, <latitude>]
-      index: '2d'      // geospatial index
+      index: '2dsphere'      // geospatial index
     }
   });
 
@@ -25,7 +27,20 @@ db.once('open', function() {
 module.exports.findGeoData = function(callback, date){
   var lnk = undefined;
   if (date) {
-    lnk = { "date": {"$gt": date}};
+    lnk = {
+      "date": {"$gt": date},
+      "$or": [
+        { "type": constants.types.POKESTOP },
+        { "type": constants.types.POKEGYM }
+      ]
+    };
+  }else{
+    lnk = {
+      "$or": [
+        { "type": constants.types.POKESTOP },
+        { "type": constants.types.POKEGYM }
+      ]
+    };
   }
 
   GeoData
@@ -34,6 +49,49 @@ module.exports.findGeoData = function(callback, date){
   .limit(500)
   .exec(callback);
 }
+
+
+module.exports.findPokemonAround = function(callback, geo) {
+  geo = geo.split(",");
+  if(geo.length < 2 || geo.length > 2) {
+    geo.push(null);
+    geo.push(null);
+  }
+  var lonLat = { $geometry :  { type : "Point" , coordinates : geo }, $maxDistance: 300000 };
+
+  GeoData
+  .find({
+    location: {
+      $near: lonLat
+    }
+  })
+  .select('-_id -__v')
+  .limit(500)
+  .exec(callback);
+}
+
+module.exports.findPokemon = function(callback, date, type){
+  var lnk = undefined;
+  if (date) {
+    lnk = {
+      "date": {
+        "$gt": date
+      },
+      "type": type
+    };
+  }else{
+    lnk = {
+      "type": type
+    };
+  }
+
+  GeoData
+  .find(lnk)
+  .select('-_id -__v')
+  .limit(500)
+  .exec(callback);
+}
+
 module.exports.newGeoData = function(params){
   return new GeoData(params);
 }

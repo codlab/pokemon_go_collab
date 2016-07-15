@@ -9,6 +9,7 @@
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="/js/store.min.js"></script>
   <script type="text/javascript" src="/js/config.js"></script>
+  <script type="text/javascript" src="/js/constants.js"></script>
 </head>
 <body>
 
@@ -86,8 +87,8 @@
     var i = 1;
     var select_code = "<option value=\"\" disabled selected>Choose your option</option>";
     select_code+= "<optgroup label=\"Lieux\">";
-    select_code+= " <option value=\"90000\" data-icon=\"images/1.png\" class=\"circle\">PokéStop</option>";
-    select_code+= " <option value=\"90001\" data-icon=\"images/1.png\" class=\"circle\">PokéGym</option>";
+    select_code+= " <option value=\""+constants.types.POKESTOP+"\" data-icon=\"images/1.png\" class=\"circle\">PokéStop</option>";
+    select_code+= " <option value=\""+constants.types.POKEGYM+"\" data-icon=\"images/1.png\" class=\"circle\">PokéGym</option>";
     select_code+= "</optgroup>";
     select_code+= "<optgroup label=\"Pokémon\">";
     for(;i<=151;i++){

@@ -3,13 +3,41 @@ var socket = io.connect(":3000");
 var map = undefined;
 var marker = undefined;
 
+var pokemon_markers = [];
+var area_locations = [];
+
+function addMarker(hash, uuid, type, location){
+  if(!hash[uuid]){
+    var new_marker = new google.maps.Marker({
+      position: new google.maps.LatLng(location[0], location[1]),
+      icon: "/images/"+type+".mini.png",
+      map: map
+    });
+    hash[uuid] = new_marker;
+  }
+}
+
+
+function appendGeoData(GeoData) {
+  var array = undefined;
+  var type = parseInt(GeoData.type);
+
+  if(type > 0 && type <= 151) {
+    array = pokemon_markers;
+  } else {
+    array = area_locations;
+  }
+
+  if(array) {
+    addMarker(array, GeoData.uuid, type, GeoData.location);
+  }
+}
+
 socket.on("newGeoData", function(GeoData){
-  console.log("newGeoData");
-  console.log(GeoData);
+  appendGeoData(GeoData);
 });
 
 function sendLocationWithType(type){
-  console.log(current_location+" "+type);
   if(current_location && type){
     sendLocation(current_location, type);
   }
@@ -46,6 +74,27 @@ function placeMarkerAndPanTo(latLng, map) {
   }else{
     marker.setPosition(latLng);
   }
+
+  try{
+    var lat = 0;
+    var lng = 0;
+
+    if($.isFunction(latLng.lat)) lat = latLng.lat();
+    else lat = latLng.lat;
+    if($.isFunction(latLng.lng)) lng = latLng.lng();
+    else lng = latLng.lng;
+
+    $.get("/api/locations/pokemon/around?geo="+lat+","+lng,
+    function(data, status){
+      var k = 0;
+      for(k in data) {
+        appendGeoData(data[k]);
+      }
+    });
+  }catch(e){
+    console.log(latLng);
+    console.log(e);
+  }
   map.panTo(latLng);
 }
 
@@ -57,7 +106,7 @@ function initMap() {
   if(lat == undefined || lng == "undefined") lat = 0;
   if(lng == undefined || lng == "undefined") lng = 0;
 
-  var map = new google.maps.Map(mapDiv, {
+  map = new google.maps.Map(mapDiv, {
     center:{lat: lat, lng: lng },
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     zoom: 18
