@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 var constants = require("../front/js/constants.js");
-
+var DEFAULT_CONSTANTS = 1000000;
 mongoose.connect('mongodb://localhost/pokemon_go');
 
 var db = mongoose.connection;
@@ -57,7 +57,7 @@ module.exports.findPokemonAround = function(callback, geo) {
     geo.push(null);
     geo.push(null);
   }
-  var lonLat = { $geometry :  { type : "Point" , coordinates : geo }, $maxDistance: 300000 };
+  var lonLat = { $geometry :  { type : "Point" , coordinates : geo }, $maxDistance: DEFAULT_CONSTANTS };
 
   GeoData
   .find({
