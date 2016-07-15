@@ -123,6 +123,7 @@
       var type = parseInt($("#types").val());
       if(type >= 1){
         sendLocationWithType(type);
+        $("#modal_new_point").closeModal();
       }
     });
 
