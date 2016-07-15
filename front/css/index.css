@@ -34,3 +34,8 @@ footer.page-footer {
 .hide {
   display: none;
 }
+
+.side-nav li.text {
+  line-height:22px;
+  padding:10px 30px;
+}
