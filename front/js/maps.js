@@ -103,7 +103,7 @@ function initMap() {
   mapDiv = document.getElementById('map');
   var lat = store.get("lat");
   var lng = store.get("lng");
-  if(lat == undefined || lng == "undefined") lat = 0;
+  if(lat == undefined || lat == "undefined") lat = 0;
   if(lng == undefined || lng == "undefined") lng = 0;
 
   map = new google.maps.Map(mapDiv, {
