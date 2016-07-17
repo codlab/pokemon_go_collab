@@ -115,11 +115,13 @@ function removeGeoData(socket, data, user) {
 function saveGeoDataSent(socket, data, user_uuid) {
   var is_pokemon = false;
   var type = parseInt(validator.escape(""+data.type));
+  var hour = validator.escape(""+data.hour);
   var GeoData = database.newGeoData({
     user_uuid: user_uuid,
     uuid: uuid.v4(),
     type: type,
     date: new Date(),
+    specific_hour: hour,
     location: [
       data.location.lat,
       data.location.lng

@@ -20,6 +20,7 @@ db.once('open', function() {
     user_uuid: String,
     type: Number,
     uuid: String,
+    specific_hour: String,
     date: { type: Date, required: true, index:true},
     location: {
       type: [Number],  // [<longitude>, <latitude>]
