@@ -3,6 +3,11 @@
     "types": {
       POKESTOP: 9000,
       POKEGYM: 9001
+    },
+    "store": {
+      UUID_KEY: "uuid",
+      PASS_KEY: "login",
+      TOKEN_KEY: "token"
     }
   }
 

@@ -34,6 +34,9 @@
         <li class="logo center" style="padding-top:20px">
           <img src="/images/logo.png" style="width:200px"/>
         </li>
+        <li class="bold"><a id="login" href="#">Login</a></li>
+        <li class="bold"><a id="register" href="#">Register</a></li>
+        <li class="bold"><a id="disconnect" href="#">Disconnect</a></li>
         <li class="bold"><a href="https://github.com/codlab/pokemon_go_collab" class="waves-effect waves-teal" target="_blank">Fork this project</a>
         </li>
         <li class="text">
@@ -49,10 +52,18 @@
   <main>
     <div class="row divider-top"></div>
 
+    <nav id="no-account" class="row divider-top">
+      <div class="nav-wrapper center">
+        Warning ! You did not login. It means that any modification you will do on the map will not be updatable
+      </div>
+    </nav>
+
     <div class="row container">
       <div id="map"></div>
 
-      <a href="#modal_new_point" id="modal" class="hide">Modal</a>
+
+      <!-- Add a new Poké(Stop/Gym/mon) point -->
+      <a href="#modal_new_point" id="modal" class="hide"></a>
       <div id="modal_new_point" class="modal bottom-sheet">
         <div class="modal-content">
           <h4>New Pokemon GO point</h4>
@@ -74,6 +85,31 @@
         </div>
       </div>
 
+      <!-- update a point-->
+      <a href="#modal_update_point" id="modal_update" class="hide"></a>
+      <div id="modal_update_point" class="modal bottom-sheet">
+        <div class="modal-content">
+          <h4>Update this Point</h4>
+          <div class="row">
+            <div class="col s12">
+
+              <div class="input-field col s6">
+                <h6 class="header2">Delete this point</h6>
+                <div class="divider"></div>
+                <br />
+                <div class="row">
+                  <button id="delete_1" class="btn red waves-effect waves-red left">Delete</button>
+                  <button id="delete_2" class="btn red waves-effect waves-red right">Sure ?</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" id="types_validate" class=" modal-action modal-close waves-effect waves-green btn-flat">Ok</a>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -86,12 +122,68 @@
     </div>
   </footer>
 
+  <!-- login part -->
+  <a id="login_modal" class="modal-trigger hide" href="#login_modal_element"></a>
+  <div id="login_modal_element" class="modal">
+    <div class="modal-content">
+      <h5 class="header2">Connect to an existing account</h5>
+      <div class="divider"></div>
+      <br />
+      <div class="row">
+        <div class="col s12">
+          <p>Please input back your private information obtained from the server the first time your created your account.</p>
+        </div>
+        <div class="col s12">
+          <div class="input-field col s12">
+            <input value="" id="login_uuid" type="text" class="validate">
+            <label class="active" for="login_uuid">Your user id</label>
+          </div>
+          <div class="input-field col s12">
+            <input value="" id="login_priv" type="text" class="validate">
+            <label class="active" for="login_priv">Your private information</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="login_cancel" class="red left btn">Cancel</button>
+      <button id="login_validate" class="success right btn">Log In</button>
+    </div>
+  </div>
+
+  <!-- register end part -->
+  <a id="register_end_modal" class="hide" href="#register_end_modal_element"></a>
+  <div id="register_end_modal_element" class="modal">
+    <div class="modal-content">
+      <h4>Registration</h4>
+      <p>Please copy and save these information. They will be your connection information</p>
+      <p class="bold" id="register_info"></p>
+      <p class="bold" id="register_priv"></p>
+    </div>
+    <div class="modal-footer">
+      <button id="register_end_validate" class="success right btn modal-action modal-close">Ok</button>
+    </div>
+  </div>
+
+  <!-- register part -->
+  <a id="register_modal" class="modal-trigger hide" href="#register_modal_element"></a>
+  <div id="register_modal_element" class="modal">
+    <div class="modal-content">
+      <h4>Registration</h4>
+      <p>Since this website and future app are dealing with sensitive information (GPS localisation). Even if the server is not registering your GPS coordinates (it can not figure out what is the user location and what is a request of data at a location). But it's making metadata. Hence, I prohibit in this version the use of personal email or password. The server will actually create them for you.</p>
+    </div>
+    <div class="modal-footer">
+      <button id="register_cancel" class="red left btn">Cancel</button>
+      <button id="register_validate" class="success right btn">Create an account</button>
+    </div>
+  </div>
 
 
-  <script type="text/javascript" src="js/jquery.js"></script>
-  <script type="text/javascript" src="js/materialize.js"></script>
-  <script type="text/javascript" src="js/materialize.init.js"></script>
-  <script type="text/javascript" src="js/maps.js"></script>
+  <script type="text/javascript" src="/js/jquery.js"></script>
+  <script type="text/javascript" src="/js/materialize.js"></script>
+  <script type="text/javascript" src="/js/materialize.init.js"></script>
+  <script type="text/javascript" src="/js/maps.js"></script>
+  <script type="text/javascript" src="/js/account.js"></script>
   <script type="text/javascript">
 
   function loadListing(){

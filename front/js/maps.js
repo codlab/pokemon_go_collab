@@ -1,37 +1,85 @@
+
+var UUID_KEY = constants.store.UUID_KEY;
+var TOKEN_KEY = constants.store.TOKEN_KEY;
+
 var socket = io.connect(":3000");
 
 var map = undefined;
 var marker = undefined;
 
+var current_marker;
+
 var pokemon_markers = [];
 var area_locations = [];
 
-function addMarker(hash, uuid, type, location){
+function deleteMarker() {
+  if(current_marker && current_marker.uuid) {
+    sendDeleteLocation(current_marker.uuid);
+  }
+}
+
+function addMarker(hash, uuid, type, location, user_uuid){
   if(!hash[uuid]){
     var new_marker = new google.maps.Marker({
       position: new google.maps.LatLng(location[0], location[1]),
       icon: "/images/"+type+".mini.png",
       map: map
     });
+
+    new_marker.addListener("click", function() {
+      var token = store.get(TOKEN_KEY);
+      if(new_marker.user_uuid && store.get(UUID_KEY) == new_marker.user_uuid && token && token.length > 0) {
+        $("#delete_1").removeClass("hide");
+        $("#delete_2").addClass("hide");
+
+        $("#modal_update").click();
+      }
+
+      current_marker = new_marker;
+    });
+    new_marker.user_uuid = user_uuid;
+    new_marker.type = type;
+    new_marker.uuid = uuid;
     hash[uuid] = new_marker;
   }
 }
 
-
-function appendGeoData(GeoData) {
-  var array = undefined;
-  var type = parseInt(GeoData.type);
-
-  if(type > 0 && type <= 151) {
-    array = pokemon_markers;
-  } else {
-    array = area_locations;
+function getHashFromUUID(uuid) {
+  if(pokemon_markers[uuid]) {
+    return pokemon_markers;
+  }else if(area_locations[uuid]) {
+    return area_locations;
   }
+  return undefined;
+}
 
-  if(array) {
-    addMarker(array, GeoData.uuid, type, GeoData.location);
+function getHashFromType(type) {
+  if(type > 0 && type <= 151) {
+    return pokemon_markers;
+  } else {
+    return area_locations;
   }
 }
+
+function appendGeoData(GeoData) {
+  var type = parseInt(GeoData.type);
+  var array = getHashFromType(type);
+
+  if(array) {
+    addMarker(array, GeoData.uuid, type, GeoData.location, GeoData.user_uuid);
+  }
+}
+
+socket.on("deletedLocation", function(GeoData) {
+  if(GeoData && GeoData.uuid) {
+    var hash = getHashFromUUID(GeoData.uuid);
+    var marker = hash[GeoData.uuid];
+    if(marker) {
+      marker.setMap(undefined);
+        hash[GeoData.uuid] = undefined;
+    }
+  }
+});
 
 socket.on("newGeoData", function(GeoData){
   appendGeoData(GeoData);
@@ -43,11 +91,20 @@ function sendLocationWithType(type){
   }
 }
 
+function sendDeleteLocation(uuid) {
+  socket.emit("deleteLocation", {
+    uuid: uuid,
+    user_uuid: store.get(UUID_KEY),
+    user_token: store.get(TOKEN_KEY)
+  });
+}
+
 function sendLocation(latLng, type){
   socket.emit("location", {
     type: parseInt(type),
     location: latLng,
-    name: ""
+    uuid: store.get(UUID_KEY),
+    token: store.get(TOKEN_KEY)
   });
 }
 
@@ -74,7 +131,6 @@ function placeMarkerAndPanTo(latLng, map) {
   }else{
     marker.setPosition(latLng);
   }
-  console.log("--");
 
   setTimeout(function(){
     var lat = 0;
@@ -146,7 +202,7 @@ function checkHTTPS(){
 }
 
 $(function(){
-
+  $("#modal_update").leanModal();
   $('#modal').leanModal();
 
   var fileref=document.createElement('script')
@@ -154,4 +210,13 @@ $(function(){
   fileref.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key="+config.maps+"&callback=initMap")
 
   $("body").first().append(fileref);
+
+  $("#delete_1").on("click", function() {
+    $("#delete_1").addClass("hide");
+    $("#delete_2").removeClass("hide");
+  });
+
+  $("#delete_2").on("click", function() {
+    deleteMarker();
+  });
 });

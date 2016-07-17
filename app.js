@@ -10,6 +10,7 @@ var database = require("./server/database.js");
 var moment = require("moment");
 var validator = require('validator');
 var uuid = require("node-uuid");
+var bodyParser = require('body-parser')
 
 if(config.key_pem && config.cert_pem && config.ca_pem && config.port){
   var https = require('https');
@@ -27,11 +28,36 @@ if(config.key_pem && config.cert_pem && config.ca_pem && config.port){
 var io = require("socket.io")(server);
 
 app
+.use(bodyParser.json())
 .use(express.static("./front"))
+.post("/api/user/register", function(req, res) {
+  database.registerUser(function(err, user) {
+    if(err) {
+      res.status(404).json({error: true});
+      return;
+    }
+    user.__v = undefined;
+    user._id = undefined;
+    res.json(user);
+  });
+})
+.post("/api/user/login", function(req, res) {
+  if(req.body.uuid && req.body.token){
+    database.loginUser(req.body.uuid, req.body.token,
+      function(err, user) {
+        //if(err || !user) res.status(404).json({error: true});
+        if(err || !user) res.status(404).json({error: err});
+        else res.json(user);
+      }
+    );
+  }else{
+    res.status(404).json({error: true});
+  }
+})
 .get("/api/locations/pokemon/around", function(req, res) {
   if(req.query.geo){
     database.findPokemonAround(function (err, geodatas){
-      if(err) res.status(404).json({error: true, err:err});
+      if(err) res.status(404).json({error: true});
       res.json(geodatas);
     }, req.query.geo);
   }else{
@@ -76,30 +102,80 @@ app
   }, date);
 });
 
-io.on('connection', function (socket) {
-  socket.on('location', function (data) {
-    var is_pokemon = false;
-    var type = parseInt(validator.escape(""+data.type));
-    var GeoData = database.newGeoData({
-      name: validator.escape(data.name),
-      uuid: uuid.v4(),
-      type: type,
-      date: new Date(),
-      location: [
-        data.location.lat,
-        data.location.lng
-      ]
+function removeGeoData(socket, data, user) {
+  if(user) {
+    database.removeGeoData(data.uuid, function (err, res) {
+      io.sockets.emit("deletedLocation",{
+        "uuid" : data.uuid
+      });
     });
+  }
+}
 
+function saveGeoDataSent(socket, data, user_uuid) {
+  var is_pokemon = false;
+  var type = parseInt(validator.escape(""+data.type));
+  var GeoData = database.newGeoData({
+    user_uuid: user_uuid,
+    uuid: uuid.v4(),
+    type: type,
+    date: new Date(),
+    location: [
+      data.location.lat,
+      data.location.lng
+    ]
+  });
 
-    GeoData.save(function(err, GeoData){
-      console.log("GeoData saved ");
-      if(type > 0 && type <= 151) {
-        socket.emit('newGeoData', GeoData);
+  GeoData.save(function(err, GeoData){
+    if(type > 0 && type <= 151) {
+      socket.emit("newGeoData", GeoData);
+    }else{
+      io.sockets.emit("newGeoData", GeoData);
+    }
+  });
+}
+
+function tryLoginUserInSocket(socket, user_uuid, user_token, callback) {
+  database.loginUser(user_uuid, user_token,
+    function(err, user) {
+      if(user) {
+        callback(user);
       }else{
-        io.sockets.emit("newGeoData", GeoData);
+        socket.emit("invalidUser", {
+          error:true,
+          message: "Wrong login?",
+          err:err
+        });
       }
-    });
+    }
+  );
+}
+
+io.on("connection", function (socket) {
+  socket.on("deleteLocation", function (data) {
+    var user_uuid = validator.escape(data.user_uuid);
+    var user_token = data.user_token;
+
+    if(user_uuid && user_token) {
+      tryLoginUserInSocket(socket, user_uuid, user_token, function(user) {
+        removeGeoData(socket, data, user_uuid);
+      });
+    }
+  });
+
+  socket.on("location", function (data) {
+    var user_uuid = validator.escape(data.uuid);
+    var user_token = data.token;
+
+    if(user_uuid && user_token) {
+      tryLoginUserInSocket(socket, user_uuid, user_token, function(user) {
+        if(user) {
+          saveGeoDataSent(socket, data, user.user_uuid);
+        }
+      });
+    }else{
+      saveGeoDataSent(socket, data, undefined);
+    }
   });
 });
 

@@ -10,10 +10,12 @@
   "author": "Kevin Le Perf",
   "license": "GPL-3.0",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "moment": "^2.14.1",
     "mongoose": "^4.5.3",
     "node-uuid": "^1.4.7",
+    "randomstring": "^1.1.5",
     "socket.io": "^1.4.8",
     "validator": "^5.4.0"
   }
