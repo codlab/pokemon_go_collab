@@ -18,7 +18,7 @@ function deleteMarker() {
   }
 }
 
-function addMarker(hash, uuid, type, location, user_uuid){
+function addMarker(hash, uuid, type, location, user_uuid, hour){
   if(!hash[uuid]){
     var new_marker = new google.maps.Marker({
       position: new google.maps.LatLng(location[0], location[1]),
@@ -39,6 +39,7 @@ function addMarker(hash, uuid, type, location, user_uuid){
     });
     new_marker.user_uuid = user_uuid;
     new_marker.type = type;
+    new_marker.hour = hour;
     new_marker.uuid = uuid;
     hash[uuid] = new_marker;
   }
@@ -66,7 +67,7 @@ function appendGeoData(GeoData) {
   var array = getHashFromType(type);
 
   if(array) {
-    addMarker(array, GeoData.uuid, type, GeoData.location, GeoData.user_uuid);
+    addMarker(array, GeoData.uuid, type, GeoData.location, GeoData.user_uuid, GeoData.hour);
   }
 }
 
@@ -90,9 +91,9 @@ socket.on("newGeoData", function(GeoData){
   appendGeoData(GeoData);
 });
 
-function sendLocationWithType(type){
+function sendLocationWithType(type, hour){
   if(current_location && type){
-    sendLocation(current_location, type);
+    sendLocation(current_location, type, hour);
   }
 }
 
@@ -104,10 +105,11 @@ function sendDeleteLocation(uuid) {
   });
 }
 
-function sendLocation(latLng, type){
+function sendLocation(latLng, type, hour){
   socket.emit("location", {
     type: parseInt(type),
     location: latLng,
+    hour: hour,
     uuid: store.get(UUID_KEY),
     token: store.get(TOKEN_KEY)
   });
@@ -116,6 +118,7 @@ function sendLocation(latLng, type){
 function onUserMarkerClicked(location){
   //location := {lat, lng}
 
+  updateInfosView();
   $("#types").removeClass("green");
   $("#modal").click();
   current_location = location;

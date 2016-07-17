@@ -64,17 +64,39 @@
 
       <!-- Add a new Poké(Stop/Gym/mon) point -->
       <a href="#modal_new_point" id="modal" class="hide"></a>
-      <div id="modal_new_point" class="modal bottom-sheet">
+      <div id="modal_new_point" class="modal bottom-sheet modal-fixed-footer">
         <div class="modal-content">
           <h4>New Pokemon GO point</h4>
           <p>Here you will be able to select the type of event on your position</p>
           <div class="row">
             <div class="col s12">
+              <div class="row col s12 m4">
+                <div class="col s12">
+                  <div class="input-field">
+                    <select mclass="icons" id="types">
+                    </select>
+                    <label>Element sur la carte</label>
+                  </div>
+                </div>
+              </div>
 
-              <div class="input-field col s12 m6">
-                <select mclass="icons" id="types">
-                </select>
-                <label>Element sur la carte</label>
+              <div class="row col s12 m4 right" id="new_point_infos">
+                <div class="row">
+                  <div class="col s8">
+                    <div class="input-field switch" style="height:25px">
+                      <label>
+                        Habituel
+                        <input id="new_point_specific_hour" type="checkbox">
+                        <span class="lever"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col s4">
+                    <div class="input-field">
+                      <input id="new_point_hour" class="disabled hide" type="text" />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -184,7 +206,19 @@
   <script type="text/javascript" src="/js/materialize.init.js"></script>
   <script type="text/javascript" src="/js/maps.js"></script>
   <script type="text/javascript" src="/js/account.js"></script>
+  <script type="text/javascript" src="/js/jquery.mask.min.js"></script>
   <script type="text/javascript">
+
+  function updateInfosView(){
+    var type = parseInt($("#types").val());
+
+    if(type >= 1 && type <= 151) {
+      $("#new_point_infos").removeClass("hide");
+    }else{
+      $("#new_point_infos").addClass("hide");
+      $("#new_point_specific_hour").attr("checked", false);
+    }
+  }
 
   function loadListing(){
     var i = 1;
@@ -208,13 +242,22 @@
       }else{
 
       }
+
+      updateInfosView();
     });
 
     console.log("init");
     $("#types_validate").click(function (e) {
+      var hour_reg=/\d\d\:\d\d/i;
+
       var type = parseInt($("#types").val());
-      if(type >= 1){
-        sendLocationWithType(type);
+      var is_specific = $("#new_point_specific_hour").is(":checked");
+      var input_hour = $("#new_point_hour").val();
+
+      var valid = !is_specific || (input_hour && hour_reg.test(input_hour));
+
+      if(type >= 1 && valid){
+        sendLocationWithType(type, input_hour);
         $("#modal_new_point").closeModal();
       }
     });
@@ -264,6 +307,20 @@
   }
 
   $(function(){
+
+    $("#new_point_hour").inputmask('hh:mm');
+
+    $("#new_point_hour").change(function() {
+      console.log($("#new_point_hour").val());
+    });
+
+    $("#new_point_specific_hour").change(function() {
+      if($(this).is(":checked")) {
+        $("#new_point_hour").removeClass("hide");
+      }else{
+        $("#new_point_hour").addClass("hide");
+      }
+    });
 
     checkHTTPS();
 
