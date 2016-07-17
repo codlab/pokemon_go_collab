@@ -76,7 +76,11 @@ socket.on("deletedLocation", function(GeoData) {
     var marker = hash[GeoData.uuid];
     if(marker) {
       marker.setMap(undefined);
-        hash[GeoData.uuid] = undefined;
+      hash[GeoData.uuid] = undefined;
+
+      if(current_marker && current_marker.uuid == GeoData.uuid) {
+        $("#modal_update_point").closeModal();
+      }
     }
   }
 });
