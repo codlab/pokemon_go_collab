@@ -80,6 +80,7 @@ socket.on("deletedLocation", function(GeoData) {
 
       if(current_marker && current_marker.uuid == GeoData.uuid) {
         $("#modal_update_point").closeModal();
+        current_marker = undefined;
       }
     }
   }
